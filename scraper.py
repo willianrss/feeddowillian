@@ -161,8 +161,11 @@ def get_items(source, session):
     )
     response.raise_for_status()
 
-    soup = BeautifulSoup(response.text, "html.parser")
-
+    if source.get("rss_xml"):
+        soup = BeautifulSoup(response.text, "xml")
+    else:
+        soup = BeautifulSoup(response.text, "html.parser")
+    
     container_selector = source.get("container_selector")
 
     if container_selector:
