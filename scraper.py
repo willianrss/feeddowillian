@@ -34,7 +34,7 @@ def load_state():
 def save_state(state):
     DATA.mkdir(exist_ok=True)
     STATE_FILE.write_text(
-        json.dumps(state, ensure_ascii=False, indent=2),
+        json.dump(state, f, ensure_ascii=False, indent=2, default=str)
         encoding="utf-8",
     )
 
