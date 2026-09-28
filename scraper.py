@@ -255,9 +255,25 @@ def main():
 
         old_items = source_state.get("items", [])
 
+        # O state.json guarda datas como texto; normalize antes de comparar/sortear.
+        normalized_old_items = []
+
+        for item in old_items:
+            item = dict(item)
+
+            if isinstance(item.get("date"), str):
+                try:
+                    item["date"] = datetime.fromisoformat(
+                        item["date"].replace("Z", "+00:00")
+                    )
+                except ValueError:
+                    continue
+
+            normalized_old_items.append(item)
+
         merged = []
 
-        for item in selected + old_items:
+        for item in selected + normalized_old_items:
             if not any(existing["link"] == item["link"] for existing in merged):
                 merged.append(item)
 
