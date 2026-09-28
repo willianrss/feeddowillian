@@ -39,8 +39,8 @@ def save_state(state):
     )
     
     
-    def clean_text(text):
-        return re.sub(r"\s+", " ", text or "").strip()
+def clean_text(text):
+    return re.sub(r"\s+", " ", text or "").strip()
 
 
 def parse_date(text):
