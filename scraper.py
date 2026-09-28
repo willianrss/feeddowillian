@@ -1,135 +1,277 @@
-from __future__ import annotations
-import json, re, time
-from datetime import datetime
-from email.utils import format_datetime
+import json
+import re
+import html
+from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urljoin
-from zoneinfo import ZoneInfo
-import xml.etree.ElementTree as ET
+
 import requests
 from bs4 import BeautifulSoup
+from email.utils import format_datetime
+
 from config import SOURCES
 
+
 ROOT = Path(__file__).resolve().parent
-DOCS, DATA = ROOT / "docs", ROOT / "data"
+DOCS = ROOT / "docs"
+DATA = ROOT / "data"
 STATE_FILE = DATA / "state.json"
-TZ = ZoneInfo("America/Sao_Paulo")
-HEADERS = {"User-Agent": "Mozilla/5.0 FeedFlowRSS/1.0", "Accept-Language": "pt-BR,pt;q=0.9"}
+
+HEADERS = {
+    "User-Agent": "Mozilla/5.0 (compatible; WillianRSS/1.0)"
+}
+
 
 def load_state():
-    if not STATE_FILE.exists(): return {}
-    try: return json.loads(STATE_FILE.read_text(encoding="utf-8"))
-    except Exception: return {}
+    if not STATE_FILE.exists():
+        return {}
+    try:
+        return json.loads(STATE_FILE.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+
 
 def save_state(state):
-    DATA.mkdir(parents=True, exist_ok=True)
-    STATE_FILE.write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8")
+    DATA.mkdir(exist_ok=True)
+    STATE_FILE.write_text(
+        json.dumps(state, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
 
-def get(url, attempts=3):
-    last = None
-    for n in range(attempts):
-        try:
-            r = requests.get(url, headers=HEADERS, timeout=25)
-            r.raise_for_status()
-            return r.text
-        except Exception as exc:
-            last = exc
-            if n + 1 < attempts: time.sleep(2 * (n + 1))
-    raise last
+
+def clean_text(text):
+    return re.sub(r"\s+", " ", text or "").strip()
+
 
 def parse_date(text):
-    if not text: return None
-    text = " ".join(text.split())
-    m = re.search(r"(?:Publicado|Atualizado)\s+em\s+(\d{1,2})/(\d{1,2})/(\d{4})\s*-\s*(\d{1,2})h(\d{2})", text, re.I)
-    if not m: return None
-    try:
-        d, mo, y, h, mi = map(int, m.groups())
-        return datetime(y, mo, d, h, mi, tzinfo=TZ)
-    except ValueError: return None
+    text = clean_text(text)
 
-def article_date(html, selector):
-    soup = BeautifulSoup(html, "html.parser")
-    node = soup.select_one(selector)
-    dt = parse_date(node.get_text(" ", strip=True) if node else "")
-    if dt: return dt
-    node = soup.select_one("time[datetime]")
-    if node:
-        try:
-            v = node.get("datetime", "").replace("Z", "+00:00")
-            dt = datetime.fromisoformat(v)
-            return (dt if dt.tzinfo else dt.replace(tzinfo=TZ)).astimezone(TZ)
-        except Exception: pass
+    match = re.search(
+        r"(?:Publicado|Atualizado)\s+em\s+(\d{1,2}/\d{1,2}/\d{4})\s*-\s*(\d{1,2})h(\d{2})",
+        text,
+        re.I,
+    )
+
+    if not match:
+        return None
+
+    date_part, hour, minute = match.groups()
+
+    try:
+        dt = datetime.strptime(
+            f"{date_part} {hour}:{minute}",
+            "%d/%m/%Y %H:%M",
+        )
+        return dt.replace(tzinfo=timezone.utc)
+    except ValueError:
+        return None
+
+
+def get_article_date(session, url):
+    try:
+        response = session.get(url, headers=HEADERS, timeout=20)
+        response.raise_for_status()
+    except Exception:
+        return None
+
+    soup = BeautifulSoup(response.text, "html.parser")
+
+    date_element = soup.select_one(".artigo-data")
+    if date_element:
+        parsed = parse_date(date_element.get_text(" ", strip=True))
+        if parsed:
+            return parsed
+
+    time_element = soup.select_one("time[datetime]")
+    if time_element:
+        value = time_element.get("datetime")
+        if value:
+            try:
+                value = value.replace("Z", "+00:00")
+                return datetime.fromisoformat(value)
+            except ValueError:
+                pass
+
     for script in soup.select('script[type="application/ld+json"]'):
         try:
             data = json.loads(script.string or script.get_text())
-            for obj in (data if isinstance(data, list) else [data]):
-                if isinstance(obj, dict) and obj.get("datePublished"):
-                    dt = datetime.fromisoformat(str(obj["datePublished"]).replace("Z", "+00:00"))
-                    return (dt if dt.tzinfo else dt.replace(tzinfo=TZ)).astimezone(TZ)
-        except Exception: pass
+        except Exception:
+            continue
+
+        objects = data if isinstance(data, list) else [data]
+
+        for obj in objects:
+            if isinstance(obj, dict):
+                value = obj.get("datePublished")
+                if value:
+                    try:
+                        value = value.replace("Z", "+00:00")
+                        return datetime.fromisoformat(value)
+                    except ValueError:
+                        pass
+
     return None
 
-def parse_list(source, html):
-    soup = BeautifulSoup(html, "html.parser")
-    rows, seen = [], set()
-    for item in soup.select(source["item_selector"])[:source["scan_items"]]:
-        title_node = item.select_one(source["title_selector"])
-        link_node = item.select_one(source["link_selector"])
-        if not title_node or not link_node or not link_node.get("href"): continue
-        title = " ".join(title_node.get_text(" ", strip=True).split())
-        link = urljoin(source["list_url"], link_node["href"])
-        if title and link not in seen:
-            seen.add(link); rows.append({"title": title, "link": link})
-    return rows
 
-def read_existing(path):
-    if not path.exists(): return []
-    try: root = ET.fromstring(path.read_text(encoding="utf-8"))
-    except Exception: return []
-    out = []
-    for item in root.findall("./channel/item"):
-        link, title, pub = item.findtext("link") or "", item.findtext("title") or "", item.findtext("pubDate") or ""
-        if link and pub:
-            try: dt = datetime.strptime(pub, "%a, %d %b %Y %H:%M:%S %z")
-            except ValueError: continue
-            out.append({"title": title, "link": link, "guid": link, "pubDate": pub, "sort_date": dt})
-    return out
+def make_item(title, link, pub_date):
+    title = html.escape(clean_text(title))
+    link = html.escape(link, quote=True)
+    pub = format_datetime(pub_date)
 
-def make_feed(source, items):
-    rss = ET.Element("rss", {"version": "2.0"})
-    ch = ET.SubElement(rss, "channel")
-    for tag, value in [("title", source["name"]),("link", source["list_url"]),("description", source["name"]),("language", "pt-BR"),("generator", "FeedFlow RSS GitHub scraper")]: ET.SubElement(ch, tag).text = value
-    for x in sorted(items, key=lambda i:i["sort_date"], reverse=True)[:source["max_items"]]:
-        it = ET.SubElement(ch, "item")
-        ET.SubElement(it, "title").text=x["title"]
-        ET.SubElement(it, "link").text=x["link"]
-        ET.SubElement(it, "guid", {"isPermaLink":"true"}).text=x["link"]
-        ET.SubElement(it, "pubDate").text=x["pubDate"]
-    ET.indent(rss, space="  ")
-    return ET.tostring(rss, encoding="utf-8", xml_declaration=True).decode("utf-8")
+    return f"""
+    <item>
+      <title>{title}</title>
+      <link>{link}</link>
+      <guid isPermaLink="true">{link}</guid>
+      <pubDate>{pub}</pubDate>
+    </item>
+    """
 
-def run_source(source):
-    DOCS.mkdir(parents=True, exist_ok=True); DATA.mkdir(parents=True, exist_ok=True)
-    state = load_state(); ss = state.setdefault(source["id"], {"initialized":False,"seen":[]}); known=set(ss.get("seen",[]))
-    path = DOCS / f'{source["id"]}.xml'; existing=read_existing(path)
-    rows=parse_list(source, get(source["list_url"]))
-    if not rows: raise RuntimeError("Nenhum artigo encontrado")
-    if not ss.get("initialized"):
-        latest=rows[0]; dt=article_date(get(latest["link"]), source["date_selector"])
-        if not dt: raise RuntimeError(f"Data original não encontrada: {latest['link']}")
-        existing=[{"title":latest["title"],"link":latest["link"],"guid":latest["link"],"pubDate":format_datetime(dt),"sort_date":dt}]
-        known.update(r["link"] for r in rows); ss["initialized"]=True
+
+def generate_feed(source, items):
+    channel_items = "\n".join(
+        make_item(item["title"], item["link"], item["date"])
+        for item in items
+    )
+
+    now = format_datetime(datetime.now(timezone.utc))
+
+    return f"""<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>{html.escape(source["name"])}</title>
+    <link>{html.escape(source["list_url"], quote=True)}</link>
+    <description>{html.escape(source["name"])}</description>
+    <lastBuildDate>{now}</lastBuildDate>
+    {channel_items}
+  </channel>
+</rss>
+"""
+
+
+def get_items(source, session):
+    response = session.get(
+        source["list_url"],
+        headers=HEADERS,
+        timeout=20,
+    )
+    response.raise_for_status()
+
+    soup = BeautifulSoup(response.text, "html.parser")
+
+    container_selector = source.get("container_selector")
+
+    if container_selector:
+        container = soup.select_one(container_selector)
+        if not container:
+            return []
+        candidates = container.select(source["item_selector"])
     else:
-        for row in rows:
-            if row["link"] in known: continue
-            dt=article_date(get(row["link"]), source["date_selector"])
-            if not dt: continue
-            existing.append({"title":row["title"],"link":row["link"],"guid":row["link"],"pubDate":format_datetime(dt),"sort_date":dt})
-            known.add(row["link"])
-        known.update(r["link"] for r in rows)
-    ss["seen"]=list(known)[-5000:]; state[source["id"]]=ss; save_state(state)
-    path.write_text(make_feed(source, existing), encoding="utf-8")
+        candidates = soup.select(source["item_selector"])
+
+    candidates = candidates[:source.get("scan_items", 30)]
+
+    results = []
+
+    for item in candidates:
+        title_element = item.select_one(source["title_selector"])
+        link_element = item.select_one(source["link_selector"])
+
+        if not title_element or not link_element:
+            continue
+
+        title = clean_text(title_element.get_text(" ", strip=True))
+        href = link_element.get("href")
+
+        if not title or not href:
+            continue
+
+        link = urljoin(source["list_url"], href)
+
+        pub_date = None
+
+        date_selector = source.get("date_selector")
+
+        if date_selector:
+            date_element = item.select_one(date_selector)
+            if date_element:
+                pub_date = parse_date(
+                    date_element.get_text(" ", strip=True)
+                )
+
+        if not pub_date:
+            pub_date = get_article_date(session, link)
+
+        if not pub_date:
+            continue
+
+        results.append(
+            {
+                "title": title,
+                "link": link,
+                "date": pub_date,
+            }
+        )
+
+    return results
+
 
 def main():
-    for source in SOURCES: run_source(source)
-if __name__ == "__main__": main()
+    DOCS.mkdir(exist_ok=True)
+    DATA.mkdir(exist_ok=True)
+
+    state = load_state()
+    session = requests.Session()
+
+    for source in SOURCES:
+        print(f"Processando: {source['name']}")
+
+        try:
+            found = get_items(source, session)
+        except Exception as exc:
+            print(f"Erro: {exc}")
+            continue
+
+        source_state = state.setdefault(source["id"], {})
+        seen = set(source_state.get("seen", []))
+
+        found.sort(key=lambda x: x["date"], reverse=True)
+
+        new_items = [
+            item for item in found
+            if item["link"] not in seen
+        ]
+
+        if not seen and found:
+            selected = found[:1]
+            seen.update(item["link"] for item in found)
+        else:
+            selected = new_items
+            seen.update(item["link"] for item in new_items)
+
+        old_items = source_state.get("items", [])
+
+        merged = []
+
+        for item in selected + old_items:
+            if not any(existing["link"] == item["link"] for existing in merged):
+                merged.append(item)
+
+        merged.sort(key=lambda x: x["date"], reverse=True)
+        merged = merged[:source.get("max_items", 50)]
+
+        source_state["seen"] = list(seen)[-200:]
+        source_state["items"] = merged
+
+        xml = generate_feed(source, merged)
+
+        output = DOCS / f"{source['id']}.xml"
+        output.write_text(xml, encoding="utf-8")
+
+        print(f"Feed salvo: {output}")
+
+    save_state(state)
+
+
+if __name__ == "__main__":
+    main()
