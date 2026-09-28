@@ -110,5 +110,6 @@ SOURCES = [
         "scan_items": 40,
         "max_items": 50,
         "twitter_filter": True,
+        "rss_xml": True,
     },
 ]
