@@ -1,16 +1,10 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">
   <channel>
     <title>Notícias da TV — Audiências</title>
     <link>https://noticiasdatv.uol.com.br/canal/audiencias-4</link>
     <description>Notícias da TV — Audiências</description>
-    <language>pt-BR</language>
-    <generator>FeedFlow RSS GitHub scraper</generator>
-    <item>
-      <title>Virou rotina: Portiolli bate o sino e fica na frente da Globo por mais de 40 minutos</title>
-      <link>https://noticiasdatv.uol.com.br/noticia/audiencias/virou-rotina-portiolli-bate-o-sino-e-fica-na-frente-da-globo-por-mais-de-40-minutos-157243</link>
-      <guid isPermaLink="true">https://noticiasdatv.uol.com.br/noticia/audiencias/virou-rotina-portiolli-bate-o-sino-e-fica-na-frente-da-globo-por-mais-de-40-minutos-157243</guid>
-      <pubDate>Sun, 27 Sep 2026 16:54:00 -0300</pubDate>
-    </item>
+    <lastBuildDate>Mon, 28 Sep 2026 01:52:29 +0000</lastBuildDate>
+    
   </channel>
 </rss>

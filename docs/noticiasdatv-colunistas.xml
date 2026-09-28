@@ -1,16 +1,10 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">
   <channel>
     <title>Notícias da TV — Colunistas</title>
     <link>https://noticiasdatv.uol.com.br/colunistas</link>
     <description>Notícias da TV — Colunistas</description>
-    <language>pt-BR</language>
-    <generator>FeedFlow RSS GitHub scraper</generator>
-    <item>
-      <title>Adriana vira onça e esculhamba Heitor por crueldade com pai em Quem Ama Cuida</title>
-      <link>https://noticiasdatv.uol.com.br/noticia/novelas/adriana-vira-onca-e-esculhamba-heitor-por-crueldade-com-pai-em-quem-ama-cuida-157217</link>
-      <guid isPermaLink="true">https://noticiasdatv.uol.com.br/noticia/novelas/adriana-vira-onca-e-esculhamba-heitor-por-crueldade-com-pai-em-quem-ama-cuida-157217</guid>
-      <pubDate>Sun, 27 Sep 2026 15:00:00 -0300</pubDate>
-    </item>
+    <lastBuildDate>Mon, 28 Sep 2026 01:52:20 +0000</lastBuildDate>
+    
   </channel>
 </rss>

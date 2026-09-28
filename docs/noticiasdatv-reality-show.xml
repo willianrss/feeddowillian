@@ -1,16 +1,10 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">
   <channel>
     <title>Notícias da TV — Reality Show</title>
     <link>https://noticiasdatv.uol.com.br/reality-show</link>
     <description>Notícias da TV — Reality Show</description>
-    <language>pt-BR</language>
-    <generator>FeedFlow RSS GitHub scraper</generator>
-    <item>
-      <title>Paulo Ricardo rechaça a 'morte do rock' e expõe como o estilo influencia até hoje</title>
-      <link>https://noticiasdatv.uol.com.br/noticia/reality-show/paulo-ricardo-rechaca-a-morte-do-rock-e-expoe-como-o-estilo-influencia-ate-hoje-157216</link>
-      <guid isPermaLink="true">https://noticiasdatv.uol.com.br/noticia/reality-show/paulo-ricardo-rechaca-a-morte-do-rock-e-expoe-como-o-estilo-influencia-ate-hoje-157216</guid>
-      <pubDate>Sun, 27 Sep 2026 16:00:00 -0300</pubDate>
-    </item>
+    <lastBuildDate>Mon, 28 Sep 2026 01:52:03 +0000</lastBuildDate>
+    
   </channel>
 </rss>

@@ -1,16 +1,10 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">
   <channel>
     <title>Notícias da TV — Televisão</title>
     <link>https://noticiasdatv.uol.com.br/canal/televisao-1</link>
     <description>Notícias da TV — Televisão</description>
-    <language>pt-BR</language>
-    <generator>FeedFlow RSS GitHub scraper</generator>
-    <item>
-      <title>Ticiane Pinheiro faz o 'quadradinho de oito' na Dança dos Famosos e pode pedir música</title>
-      <link>https://noticiasdatv.uol.com.br/noticia/televisao/ticiane-pinheiro-faz-o-quadradinho-de-oito-na-danca-dos-famosos-e-pode-pedir-musica-157246</link>
-      <guid isPermaLink="true">https://noticiasdatv.uol.com.br/noticia/televisao/ticiane-pinheiro-faz-o-quadradinho-de-oito-na-danca-dos-famosos-e-pode-pedir-musica-157246</guid>
-      <pubDate>Sun, 27 Sep 2026 20:11:00 -0300</pubDate>
-    </item>
+    <lastBuildDate>Mon, 28 Sep 2026 01:51:54 +0000</lastBuildDate>
+    
   </channel>
 </rss>
