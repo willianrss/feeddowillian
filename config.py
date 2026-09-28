@@ -54,6 +54,7 @@ SOURCES = [
         "scan_items": 30,
         "max_items": 50,
     },
+
     {
         "id": "natelinha-televisao",
         "name": "NaTelinha — Televisão",
@@ -64,4 +65,38 @@ SOURCES = [
         "link_selector": "a",
         "scan_items": 30,
         "max_items": 50,
-    },]
+    },
+    {
+        "id": "natelinha-audiencias",
+        "name": "NaTelinha — Audiências",
+        "list_url": "https://natelinha.uol.com.br/audiencias",
+        "container_selector": ".noticiasList",
+        "item_selector": ".noticia",
+        "title_selector": ".titulo a",
+        "link_selector": "a",
+        "scan_items": 30,
+        "max_items": 50,
+    },
+    {
+        "id": "natelinha-colunas",
+        "name": "NaTelinha — Colunas",
+        "list_url": "https://natelinha.uol.com.br/colunas",
+        "container_selector": ".noticiasList",
+        "item_selector": ".noticia",
+        "title_selector": ".titulo a",
+        "link_selector": "a",
+        "scan_items": 30,
+        "max_items": 50,
+    },
+    {
+        "id": "natelinha-tv-historia",
+        "name": "NaTelinha — TV História",
+        "list_url": "https://natelinha.uol.com.br/tv-historia",
+        "container_selector": ".noticiasList",
+        "item_selector": ".noticia",
+        "title_selector": ".titulo a",
+        "link_selector": "a",
+        "scan_items": 30,
+        "max_items": 50,
+    },
+]
