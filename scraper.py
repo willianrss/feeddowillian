@@ -163,8 +163,44 @@ def get_items(source, session):
 
     if source.get("rss_xml"):
         soup = BeautifulSoup(response.text, "xml")
-    else:
-        soup = BeautifulSoup(response.text, "html.parser")
+        candidates = soup.find_all("item")
+        candidates = candidates[:source.get("scan_items", 30)]
+
+        results = []
+
+        for item in candidates:
+            title_element = item.find("title")
+            link_element = item.find("link")
+            date_element = item.find("pubDate")
+
+            if not title_element or not link_element or not date_element:
+                continue
+
+            title = clean_text(title_element.get_text(" ", strip=True))
+            href = clean_text(link_element.get_text(" ", strip=True))
+
+            if not title or not href:
+                continue
+
+            try:
+                pub_date = datetime.strptime(
+                    clean_text(date_element.get_text(" ", strip=True)),
+                    "%a, %d %b %Y %H:%M:%S %z",
+                )
+            except ValueError:
+                continue
+
+            results.append(
+                {
+                    "title": title,
+                    "link": href,
+                    "date": pub_date,
+                }
+            )
+
+        return results
+
+    soup = BeautifulSoup(response.text, "html.parser")
     
     container_selector = source.get("container_selector")
 
