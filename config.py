@@ -58,7 +58,7 @@ SOURCES = [
         "id": "natelinha-televisao",
         "name": "NaTelinha — Televisão",
         "list_url": "https://natelinha.uol.com.br/televisao",
-        "container_selector": "section",
+        "container_selector": "div.container",
         "item_selector": ".noticia",
         "title_selector": ".titulo a",
         "link_selector": "a",
