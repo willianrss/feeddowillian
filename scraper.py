@@ -187,6 +187,23 @@ def get_items(source, session):
         title = clean_text(title_element.get_text(" ", strip=True))
         href = link_element.get("href")
 
+        if source.get("twitter_filter"):
+            links = [
+                a for a in item.select(".activity-descp a")
+                if a.get("href") and a.get("href") not in {"#", ""}
+            ]
+
+            link_texts = [
+                clean_text(a.get_text(" ", strip=True)).lower()
+                for a in links
+            ]
+
+            if any("tvpop.com.br" in text for text in link_texts):
+                continue
+
+            if any("whatsapp.com" not in text for text in link_texts):
+                continue
+                
         if not title or not href:
             continue
 
