@@ -116,6 +116,10 @@ def get_article_date(session, url):
 def make_item(title, link, pub_date):
     title = html.escape(clean_text(title))
     link = html.escape(link, quote=True)
+    
+    if isinstance(pub_date, str):
+        pub_date = datetime.fromisoformat(pub_date.replace("Z", "+00:00"))
+
     pub = format_datetime(pub_date)
 
     return f"""
