@@ -47,7 +47,7 @@ def parse_date(text):
     text = clean_text(text)
 
     match = re.search(
-        r"(?:Publicado|Atualizado)\s+em\s+(\d{1,2}/\d{1,2}/\d{4})\s*-\s*(\d{1,2})h(\d{2})",
+        r"(?:Publicado|Atualizado)\s+em\s+(\d{1,2}/\d{1,2}/\d{4})\s+às\s+(\d{1,2}):(\d{2})",
         text,
         re.I,
     )
