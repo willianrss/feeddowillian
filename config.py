@@ -54,7 +54,6 @@ SOURCES = [
         "scan_items": 30,
         "max_items": 50,
     },
-]
     {
         "id": "natelinha-televisao",
         "name": "NaTelinha — Televisão",
@@ -65,4 +64,4 @@ SOURCES = [
         "link_selector": "a",
         "scan_items": 30,
         "max_items": 50,
-    },
+    },]
