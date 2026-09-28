@@ -99,4 +99,16 @@ SOURCES = [
         "scan_items": 30,
         "max_items": 50,
     },
+    {
+        "id": "ricksouza",
+        "name": "X — Rick Souza",
+        "list_url": "https://twstalker.com/RickSouza",
+        "container_selector": "#tweets-tabs",
+        "item_selector": ":scope > div",
+        "title_selector": ".activity-descp > p:first-of-type",
+        "link_selector": ".main-user-dts1 a[href*='/status/']",
+        "scan_items": 40,
+        "max_items": 50,
+        "twitter_filter": True,
+    },
 ]
