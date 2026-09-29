@@ -172,6 +172,7 @@ def get_items(source, session):
             title_element = item.find("title")
             link_element = item.find("link")
             date_element = item.find("pubDate")
+            description_element = item.find("description")
 
             if not title_element or not link_element or not date_element:
                 continue
@@ -180,6 +181,42 @@ def get_items(source, session):
             href = clean_text(link_element.get_text(" ", strip=True))
 
             if not title or not href:
+                continue
+
+            description_html = (
+                description_element.decode_contents()
+                if description_element
+                else ""
+            )
+
+            description_soup = BeautifulSoup(
+                description_html,
+                "html.parser",
+            )
+
+            links = [
+                a for a in description_soup.select("a")
+                if a.get("href") and a.get("href") not in {"#", ""}
+            ]
+
+            link_texts = [
+                clean_text(a.get_text(" ", strip=True)).lower()
+                for a in links
+            ]
+
+            description_text = clean_text(
+                description_soup.get_text(" ", strip=True)
+            ).lower()
+
+            if "tvpop.com.br" in description_text:
+                continue
+
+            external_links = [
+                text for text in link_texts
+                if "whatsapp.com" not in text
+            ]
+
+            if external_links:
                 continue
 
             try:
