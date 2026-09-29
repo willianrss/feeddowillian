@@ -194,29 +194,24 @@ def get_items(source, session):
                 "html.parser",
             )
 
-            links = [
-                a for a in description_soup.select("a")
-                if a.get("href") and a.get("href") not in {"#", ""}
-            ]
-
-            link_texts = [
-                clean_text(a.get_text(" ", strip=True)).lower()
-                for a in links
-            ]
-
             description_text = clean_text(
                 description_soup.get_text(" ", strip=True)
             ).lower()
 
-            if "tvpop.com.br" in description_text:
+            urls = re.findall(
+                r"https?://\S+|www\.\S+",
+                description_text,
+            )
+
+            if any("tvpop.com.br" in url for url in urls):
                 continue
 
-            external_links = [
-                text for text in link_texts
-                if "whatsapp.com" not in text
+            external_urls = [
+                url for url in urls
+                if "whatsapp.com" not in url
             ]
 
-            if external_links:
+            if external_urls:
                 continue
 
             try:
