@@ -102,7 +102,7 @@ SOURCES = [
     {
         "id": "ricksouza",
         "name": "X — Rick Souza",
-        "list_url": "https://fxtwitter.com/RickSouza/feed.xml",
+        "list_url": "https://fxtwitter.com/RickSouza/feed.xml?count=100&with_replies=1",
         "container_selector": "#tweets-tabs",
         "item_selector": ":scope > div",
         "title_selector": ".activity-descp > p:first-of-type",
