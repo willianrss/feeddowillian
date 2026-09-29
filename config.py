@@ -107,7 +107,7 @@ SOURCES = [
         "item_selector": ":scope > div",
         "title_selector": ".activity-descp > p:first-of-type",
         "link_selector": ".main-user-dts1 a[href*='/status/']",
-        "scan_items": 40,
+        "scan_items": 100,
         "max_items": 50,
         "twitter_filter": True,
         "rss_xml": True,
