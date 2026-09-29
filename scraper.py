@@ -215,11 +215,12 @@ def get_items(source, session):
                 continue
 
             try:
-                pub_date = datetime.strptime(
-                    clean_text(date_element.get_text(" ", strip=True)),
-                    "%a, %d %b %Y %H:%M:%S %z",
+                from email.utils import parsedate_to_datetime
+
+                pub_date = parsedate_to_datetime(
+                    clean_text(date_element.get_text(" ", strip=True))
                 )
-            except ValueError:
+            except (TypeError, ValueError):
                 continue
 
             results.append(
