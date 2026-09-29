@@ -209,6 +209,9 @@ def get_items(source, session):
             external_urls = [
                 url for url in urls
                 if "whatsapp.com" not in url
+                and "pbs.twimg.com" not in url
+                and "video.twimg.com" not in url
+                and "abs.twimg.com" not in url
             ]
 
             if external_urls:
