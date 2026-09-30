@@ -54,16 +54,14 @@ SOURCES = [
         "scan_items": 30,
         "max_items": 50,
     },
-
     {
         "id": "natelinha-televisao",
         "name": "NaTelinha — Televisão",
         "list_url": "https://natelinha.uol.com.br/televisao",
-        "container_selector": ".noticiasList",
-        "item_selector": ".noticia",
+        "item_selector": ".noticia:has(a[href*='/televisao/'])",
         "title_selector": ".titulo a",
-        "link_selector": "a",
-        "scan_items": 30,
+        "link_selector": "a[href*='/televisao/']",
+        "scan_items": 50,
         "max_items": 50,
     },
     {
