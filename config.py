@@ -19,6 +19,7 @@ SOURCES = [
         "title_selector": ".titulo_capa",
         "link_selector": "a",
         "date_selector": ".artigo-data",
+        "link_path_contains": "/reality-show/",
         "scan_items": 30,
         "max_items": 50,
     },
