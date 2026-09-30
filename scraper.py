@@ -183,10 +183,6 @@ def get_items(source, session):
             if not title or not href:
                 continue
             
-            allowed_path = source.get("link_path_contains")
-            if allowed_path and allowed_path not in href:
-                continue
-
             description_html = (
                 description_element.decode_contents()
                 if description_element
