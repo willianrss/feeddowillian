@@ -203,7 +203,7 @@ def get_items(source, session):
                 description_text,
             )
 
-            if any("tvpop.com.br" in url for url in urls):
+            if any("tvpop.com.br" in url.lower() for url in urls):
                 continue
 
             external_urls = [
