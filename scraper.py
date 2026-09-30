@@ -357,6 +357,12 @@ def main():
         for item in old_items:
             item = dict(item)
 
+            link = item.get("link")
+            allowed_path = source.get("link_path_contains")
+
+            if allowed_path and allowed_path not in link:
+                continue
+
             if isinstance(item.get("date"), str):
                 try:
                     item["date"] = datetime.fromisoformat(
