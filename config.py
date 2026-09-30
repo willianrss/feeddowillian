@@ -19,7 +19,7 @@ SOURCES = [
         "title_selector": ".titulo_capa",
         "link_selector": "a",
         "date_selector": ".artigo-data",
-        "scan_items": 30,
+        "scan_items": 100,
         "max_items": 50,
     },
     {
