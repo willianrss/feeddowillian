@@ -370,6 +370,13 @@ def main():
             if allowed_path and allowed_path not in link:
                 continue
 
+            if source.get("twitter_filter") and not re.search(
+                r"https://x\.com/RickSouza/status/",
+                link or "",
+                re.I,
+            ):
+                continue
+
             if isinstance(item.get("date"), str):
                 try:
                     item["date"] = datetime.fromisoformat(
