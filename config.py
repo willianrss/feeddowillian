@@ -7,7 +7,7 @@ SOURCES = [
         "title_selector": ".titulo_capa",
         "link_selector": "a",
         "date_selector": ".artigo-data",
-        "link_path_contains": "/canal/televisao-1/",
+        "link_path_contains": "/noticia/televisao/",
         "scan_items": 30,
         "max_items": 50,
     },
