@@ -183,6 +183,13 @@ def get_items(source, session):
             if not title or not href:
                 continue
             
+            if source.get("twitter_filter") and not re.search(
+                r"/RickSouza/status/",
+                href,
+                re.I,
+            ):
+                continue
+            
             description_html = (
                 description_element.decode_contents()
                 if description_element
